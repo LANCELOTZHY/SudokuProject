@@ -19,14 +19,14 @@ class SudokuGrid extends JFrame {
     JLabel jllHintNum;
     JButton jbnEasy;
     JButton jbnMid;
-    JButton jbnDit;
-    JButton jbnBackout;
+    JButton jbnHard;
+    JButton jbnRepeal;
     JButton jbnHint;
     JButton jbnWipe;
     JButton jbnNote;
     JButton jbnArchive;
     JButton jbnRead;
-    JButton jbnEnd;
+    JButton jbnJudgement;
     JPanel[] pnlGame;
     JTextField[][][] txtGame;
     UndoManager undoManager;
@@ -40,9 +40,9 @@ class SudokuGrid extends JFrame {
     public void gridInit() {
         Container container = this.getContentPane();
         container.setLayout(null);
-        this.setSize(1100, 725);
+        this.setSize(1100, 715);
         this.setLocationRelativeTo(null);
-        this.setTitle("快乐数独");
+        this.setTitle("Sudoku Game");
         undoManager = new UndoManager();
 
         jllNewGame = new JLabel();
@@ -55,13 +55,13 @@ class SudokuGrid extends JFrame {
         jbnEasy.setBackground(Color.green);
         jbnEasy.setSize(125, 100);
         jbnEasy.setLocation(700, 100);
-        jbnEasy.setFont(new Font("宋体", Font.PLAIN, 40));
+        jbnEasy.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         jbnEasy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reset();
-                int[][] sudoku = easyGame();
-                setBoard(sudoku);
+                Reset();
+                int[][] sudoku = EasyGame();
+                SetBoard(sudoku);
             }
         });
         container.add(jbnEasy);
@@ -70,54 +70,54 @@ class SudokuGrid extends JFrame {
         jbnMid.setBackground(Color.yellow);
         jbnMid.setSize(125, 100);
         jbnMid.setLocation(825, 100);
-        jbnMid.setFont(new Font("宋体", Font.PLAIN, 40));
+        jbnMid.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         jbnMid.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reset();
-                int[][] sudoku = midGame();
-                setBoard(sudoku);
+                Reset();
+                int[][] sudoku = MidGame();
+                SetBoard(sudoku);
             }
         });
         container.add(jbnMid);
 
-        jbnDit = new JButton("困难");
-        jbnDit.setBackground(Color.red);
-        jbnDit.setSize(125, 100);
-        jbnDit.setLocation(950, 100);
-        jbnDit.setFont(new Font("宋体", Font.PLAIN, 40));
-        jbnDit.addActionListener(new ActionListener() {
+        jbnHard = new JButton("困难");
+        jbnHard.setBackground(Color.red);
+        jbnHard.setSize(125, 100);
+        jbnHard.setLocation(950, 100);
+        jbnHard.setFont(new Font("微软雅黑", Font.PLAIN, 40));
+        jbnHard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reset();
-                int[][] sudoku = hardGame();
-                setBoard(sudoku);
+                Reset();
+                int[][] sudoku = HardGame();
+                SetBoard(sudoku);
             }
         });
-        container.add(jbnDit);
+        container.add(jbnHard);
 
-        jbnEnd = new JButton("判断结束");
-        jbnEnd.setBackground(Color.pink);
-        jbnEnd.setSize(375, 100);
-        jbnEnd.setLocation(700, 200);
-        jbnEnd.setFont(new Font("宋体", Font.PLAIN, 40));
-        jbnEnd.addActionListener(new ActionListener() {
+        jbnJudgement = new JButton("结束");
+        jbnJudgement.setBackground(Color.pink);
+        jbnJudgement.setSize(375, 100);
+        jbnJudgement.setLocation(700, 200);
+        jbnJudgement.setFont(new Font("微软雅黑", Font.PLAIN, 40));
+        jbnJudgement.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                end();
+                Judgement();
             }
         });
-        container.add(jbnEnd);
+        container.add(jbnJudgement);
 
         jbnArchive = new JButton("存档");
-        jbnArchive.setFont(new Font("宋体", Font.PLAIN, 40));
+        jbnArchive.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         jbnArchive.setBackground(Color.cyan);
         jbnArchive.setSize(150, 100);
         jbnArchive.setLocation(735, 350);
         jbnArchive.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                storage();
+                Storage();
             }
         });
         container.add(jbnArchive);
@@ -125,22 +125,22 @@ class SudokuGrid extends JFrame {
         jbnRead = new JButton("读取");
         jbnRead.setSize(150, 100);
         jbnRead.setLocation(885, 350);
-        jbnRead.setFont(new Font("宋体", Font.PLAIN, 40));
+        jbnRead.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         jbnRead.setBackground(Color.cyan);
         jbnRead.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                read();
+                Read();
             }
         });
         container.add(jbnRead);
 
-        jbnBackout = new JButton("撤销");
-        jbnBackout.setBackground(Color.ORANGE);
-        jbnBackout.setSize(150, 100);
-        jbnBackout.setLocation(735, 450);
-        jbnBackout.setFont(new Font("楷体", Font.PLAIN, 40));
-        jbnBackout.addActionListener(new ActionListener() {
+        jbnRepeal = new JButton("撤销");
+        jbnRepeal.setBackground(Color.ORANGE);
+        jbnRepeal.setSize(150, 100);
+        jbnRepeal.setLocation(735, 450);
+        jbnRepeal.setFont(new Font("微软雅黑", Font.PLAIN, 40));
+        jbnRepeal.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (undoManager.canUndo()) {
@@ -148,36 +148,35 @@ class SudokuGrid extends JFrame {
                 }
             }
         });
-        container.add(jbnBackout);
+        container.add(jbnRepeal);
 
         jbnHint = new JButton("提示");
         jbnHint.setBackground(Color.ORANGE);
         jbnHint.setSize(150, 100);
         jbnHint.setLocation(735, 550);
-        jbnHint.setFont(new Font("楷体", Font.PLAIN, 40));
+        jbnHint.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         container.add(jbnHint);
 
         jbnWipe = new JButton("擦除");
         jbnWipe.setBackground(Color.ORANGE);
         jbnWipe.setSize(150, 100);
         jbnWipe.setLocation(885, 450);
-        jbnWipe.setFont(new Font("楷体", Font.PLAIN, 40));
+        jbnWipe.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         container.add(jbnWipe);
 
         jbnNote = new JButton("笔记");
         jbnNote.setBackground(Color.ORANGE);
         jbnNote.setSize(150, 100);
         jbnNote.setLocation(885, 550);
-        jbnNote.setFont(new Font("楷体", Font.PLAIN, 40));
+        jbnNote.setFont(new Font("微软雅黑", Font.PLAIN, 40));
         container.add(jbnNote);
 
         jllHintNum = new JLabel("3");//剩余提示次数
-        jllHintNum.setLocation(715, 600);
+        jllHintNum.setLocation(700, 580);
         jllHintNum.setSize(30, 40);
-        jllHintNum.setFont(new Font("楷体", Font.PLAIN, 30));
+        jllHintNum.setFont(new Font("微软雅黑", Font.PLAIN, 30));
         container.add(jllHintNum);
 
-        //创建文本区域
         for (int i = 0; i < 9; i++) {
             pnlGame[i] = new JPanel();
             pnlGame[i].setBorder(BorderFactory.createLineBorder(Color.black, 2));
@@ -199,7 +198,7 @@ class SudokuGrid extends JFrame {
                 pnlGame[i].setLocation(0, 450);
             } else if (i == 7) {
                 pnlGame[i].setLocation(225, 450);
-            } else if (i == 8) {
+            } else {
                 pnlGame[i].setLocation(450, 450);
             }
             container.add(pnlGame[i]);
@@ -229,15 +228,13 @@ class SudokuGrid extends JFrame {
         this.setVisible(true);
     }
 
-    //判断结果是否正确
-    public void end() {
+    public void Judgement() {
         JFrame frameJudge = new JFrame("Winning or Losing");
         frameJudge.setSize(600, 100);
         JPanel jpJudge = new JPanel();
         JLabel labelWin = new JLabel();
         JLabel labelLose = new JLabel();
 
-        //输赢判断部分
         ArrayList<String> result = new ArrayList<>();
         newSudoku:
         for (int i = 1; i <= 1; i++) {
@@ -259,7 +256,7 @@ class SudokuGrid extends JFrame {
                 }
             }
 
-            //判断是否含0，0代表没有填写
+            //判断数独中是否含0，含0代表没有填写数字
             for (int line = 0; line < 9; line++) {
                 for (int column = 0; column < 9; column++) {
                     if (sudoku[line][column] == 0) {
@@ -269,7 +266,7 @@ class SudokuGrid extends JFrame {
                 }
             }
 
-            //判断每一行是否符合标准
+            //判断每一行是否符合1到9不重复的标准
             for (int line = 0; line < 9; line++) {
                 int[] arrLine = new int[9];
                 for (int column = 0; column < 9; column++) {
@@ -282,7 +279,7 @@ class SudokuGrid extends JFrame {
                 }
             }
 
-            //判断每一列是否符合标准
+            //判断每一列是否符合1到9不重复的标准
             for (int column = 0; column < 9; column++) {
                 int[] arrCol = new int[9];
                 for (int line = 0; line < 9; line++) {
@@ -295,7 +292,7 @@ class SudokuGrid extends JFrame {
                 }
             }
 
-            //判断每一方块是否符合标准
+            //判断每一个方块是否符合1到9不重复的标准
             for (int line = 0; line < 9; line += 3) {
                 for (int column = 0; column < 9; column += 3) {
                     int[] arrSquare = new int[9];
@@ -332,12 +329,11 @@ class SudokuGrid extends JFrame {
         frameJudge.setLocationRelativeTo(null);
     }
 
-    public void storage() {
+    public void Storage() {
         File fileStorage = new File("Storage.txt");
         File fileEditable = new File("Editable.txt");
 
-        //将数独输入二维数组sudokuStore[][]
-        //将txtGame[z][x][y]转成sudokuStore[][]
+        //将数独txtGame[z][x][y]存入二维数组sudokuStore[][]
         int[][] sudokuStore = new int[9][9];
         int z = 0;
         for (int line = 0; line < 9; line += 3) {
@@ -347,8 +343,7 @@ class SudokuGrid extends JFrame {
                         String str = txtGame[z][squareLine % 3][squareCol % 3].getText();
                         if (str.equals("")) {
                             sudokuStore[squareLine][squareCol] = 0;
-                        }
-                        else {
+                        } else {
                             sudokuStore[squareLine][squareCol] = Integer.parseInt(str);
                         }
                     }
@@ -357,7 +352,7 @@ class SudokuGrid extends JFrame {
             }
         }
 
-        //将二维数组sudokuStore[][]存入Storage.txt中保存之前的数独
+        //将二维数组sudokuStore[][]存入Storage.txt中保存
         PrintWriter outputStorage = null;
         try {
             outputStorage = new PrintWriter(fileStorage);
@@ -372,7 +367,7 @@ class SudokuGrid extends JFrame {
         }
         outputStorage.close();
 
-        //将原数独中数字是否可编辑存入Editable.txt中
+        //创建该数独中代表数字是否可编辑的数组sudokuEditable[][]，1代表可编辑，0代表不可编辑
         int[][] sudokuEditable = new int[9][9];
         z = 0;
         for (int line = 0; line < 9; line += 3) {
@@ -380,10 +375,9 @@ class SudokuGrid extends JFrame {
                 for (int squareLine = line; squareLine < line + 3; squareLine++) {
                     for (int squareCol = column; squareCol < column + 3; squareCol++) {
                         String str = txtGame[z][squareLine % 3][squareCol % 3].getText();
-                        if (txtGame[z][squareLine % 3][squareCol % 3].isEditable() == true) {
+                        if (txtGame[z][squareLine % 3][squareCol % 3].isEditable()) {
                             sudokuEditable[squareLine][squareCol] = 1;
-                        }
-                        else {
+                        } else {
                             sudokuEditable[squareLine][squareCol] = 0;
                         }
                     }
@@ -392,7 +386,7 @@ class SudokuGrid extends JFrame {
             }
         }
 
-        //将二维数组sudokuStore[][]存入Storage.txt中保存之前的数独
+        //将二维数组sudokuEditable[][]存入Editable.txt中保存之前的数独
         PrintWriter outputEditable = null;
         try {
             outputEditable = new PrintWriter(fileEditable);
@@ -408,7 +402,7 @@ class SudokuGrid extends JFrame {
         outputEditable.close();
     }
 
-    public void read() {
+    public void Read() {
         File fileStorage = new File("Storage.txt");
         File fileEditable = new File("Editable.txt");
 
@@ -428,7 +422,6 @@ class SudokuGrid extends JFrame {
         }
         BufferedReader bufferEditable = new BufferedReader(inputStreamEditable);
 
-        //创建二维数组sudokuLoad[][]以及sudokuEditable[][]
         int[][] sudokuLoad = new int[9][9];
         int[][] sudokuEditable = new int[9][9];
 
@@ -468,22 +461,10 @@ class SudokuGrid extends JFrame {
             ioException.printStackTrace();
         }
 
-        //刷新数独
-        int z = 0;
-        for (int line = 0; line < 9; line += 3) {
-            for (int column = 0; column < 9; column += 3) {
-                for (int squareLine = line; squareLine < line + 3; squareLine++) {
-                    for (int squareCol = column; squareCol < column + 3; squareCol++) {
-                        txtGame[z][squareLine % 3][squareCol % 3].setText("");
-                        txtGame[z][squareLine % 3][squareCol % 3].setEditable(true);
-                    }
-                }
-                z = z + 1;
-            }
-        }
+        Reset();
 
-        //将sudokuLoad[][]赋值给txtGame[z][x][y]
-        z = 0;
+        //将sudokuLoad[][]赋值给txtGame[z][x][y]，并判断每个数字是否为可编辑的数字
+        int z = 0;
         for (int line = 0; line < 9; line += 3) {
             for (int column = 0; column < 9; column += 3) {
                 for (int squareLine = line; squareLine < line + 3; squareLine++) {
@@ -491,10 +472,10 @@ class SudokuGrid extends JFrame {
                         if (sudokuLoad[squareLine][squareCol] != 0 ) {
                             txtGame[z][squareLine % 3][squareCol % 3].setText(String.valueOf(sudokuLoad[squareLine][squareCol]));
                         }
-                        if(sudokuEditable[squareLine][squareCol] == 0){
+                        if (sudokuEditable[squareLine][squareCol] == 0){
                             txtGame[z][squareLine % 3][squareCol % 3].setEditable(false);
                         }
-                        if(sudokuLoad[squareLine][squareCol] == 1){
+                        if (sudokuEditable[squareLine][squareCol] == 1){
                             txtGame[z][squareLine % 3][squareCol % 3].setEditable(true);
                         }
                     }
@@ -504,7 +485,8 @@ class SudokuGrid extends JFrame {
         }
     }
 
-    public void reset() {
+    public void Reset() {
+        //刷新文本框
         for (int z = 0; z < 9; z++) {
             for (int x = 0; x < 3; x++) {
                 for (int y = 0; y < 3; y++) {
@@ -515,13 +497,13 @@ class SudokuGrid extends JFrame {
         }
     }
 
-    public void setBoard(int[][] sudoku) {
+    public void SetBoard(int[][] sudoku) {
         int z = 0;
         for (int line = 0; line < 9; line += 3) {
             for (int column = 0; column < 9; column += 3) {
                 for (int squareLine = line; squareLine < line + 3; squareLine++) {
                     for (int squareCol = column; squareCol < column + 3; squareCol++) {
-                        if(sudoku[squareLine][squareCol]!=0) {
+                        if (sudoku[squareLine][squareCol] != 0) {
                             txtGame[z][squareLine % 3][squareCol % 3].setText(String.valueOf(sudoku[squareLine][squareCol]));
                             txtGame[z][squareLine % 3][squareCol % 3].setEditable(false);
                         }
@@ -532,12 +514,11 @@ class SudokuGrid extends JFrame {
         }
     }
 
-    public int[][] easyGame() {
-        // TODO Auto-generated method stub
+    public int[][] EasyGame() {
         int a = (int) (Math.random() * 10);
         switch (a) {
             case 0:
-                int easy1[][] = {
+                return new int[][]{
                         {0, 6, 1, 0, 3, 0, 0, 2, 0},
                         {0, 5, 0, 0, 0, 8, 1, 0, 7},
                         {0, 0, 0, 0, 0, 7, 0, 3, 4},
@@ -548,10 +529,8 @@ class SudokuGrid extends JFrame {
                         {8, 0, 2, 4, 0, 0, 7, 6, 0},
                         {6, 4, 0, 0, 1, 0, 2, 5, 0},
                 };
-                return easy1;
-
             case 1:
-                int easy2[][] = {
+                return new int[][]{
                         {1, 0, 0, 8, 3, 0, 0, 0, 2},
                         {5, 7, 0, 0, 0, 1, 0, 0, 0},
                         {0, 0, 0, 5, 0, 9, 0, 6, 4},
@@ -562,10 +541,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 6, 0, 0, 0, 7, 9},
                         {8, 0, 0, 0, 5, 2, 0, 0, 3},
                 };
-                return easy2;
-
             case 2:
-                int easy3[][] = {
+                return new int[][]{
                         {0, 3, 0, 0, 0, 7, 0, 0, 4},
                         {6, 0, 2, 0, 4, 1, 0, 0, 0},
                         {0, 5, 0, 0, 3, 0, 9, 6, 7},
@@ -576,10 +553,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 1, 6, 0, 8, 0, 9},
                         {4, 0, 0, 5, 0, 0, 0, 3, 0},
                 };
-                return easy3;
-
             case 3:
-                int easy4[][] = {
+                return new int[][]{
                         {0, 8, 5, 0, 0, 0, 2, 1, 0},
                         {0, 9, 4, 0, 1, 2, 0, 0, 3},
                         {0, 0, 0, 3, 0, 0, 7, 0, 4},
@@ -590,10 +565,8 @@ class SudokuGrid extends JFrame {
                         {1, 0, 0, 8, 4, 0, 3, 6, 0},
                         {0, 2, 7, 0, 0, 0, 8, 9, 0},
                 };
-                return easy4;
-
             case 4:
-                int easy5[][] = {
+                return new int[][]{
                         {0, 8, 0, 0, 0, 1, 6, 0, 0},
                         {0, 7, 0, 4, 0, 0, 0, 2, 1},
                         {5, 0, 0, 3, 9, 6, 0, 0, 0},
@@ -604,10 +577,8 @@ class SudokuGrid extends JFrame {
                         {3, 1, 0, 0, 0, 2, 0, 5, 0},
                         {0, 0, 5, 8, 0, 0, 0, 4, 0},
                 };
-                return easy5;
-
             case 5:
-                int easy6[][] = {
+                return new int[][]{
                         {0, 0, 1, 0, 0, 0, 5, 0, 0},
                         {0, 8, 0, 0, 0, 6, 2, 9, 0},
                         {6, 3, 0, 2, 0, 0, 0, 0, 4},
@@ -618,10 +589,8 @@ class SudokuGrid extends JFrame {
                         {0, 9, 3, 7, 0, 0, 0, 1, 0},
                         {0, 0, 2, 0, 0, 0, 3, 0, 0},
                 };
-                return easy6;
-
             case 6:
-                int easy7[][] = {
+                return new int[][]{
                         {9, 1, 0, 0, 0, 0, 0, 3, 7},
                         {0, 0, 2, 0, 0, 0, 6, 0, 0},
                         {8, 0, 0, 6, 0, 9, 0, 0, 5},
@@ -632,10 +601,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 1, 0, 0, 0, 3, 0, 0},
                         {2, 5, 0, 0, 0, 0, 0, 1, 9},
                 };
-                return easy7;
-
             case 7:
-                int easy8[][] = {
+                return new int[][]{
                         {8, 0, 3, 0, 0, 1, 0, 0, 0},
                         {0, 0, 0, 0, 0, 0, 4, 0, 0},
                         {1, 0, 0, 0, 2, 8, 0, 0, 3},
@@ -646,10 +613,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 9, 0, 0, 0, 0, 0, 0},
                         {0, 0, 0, 8, 0, 0, 6, 0, 2},
                 };
-                return easy8;
-
             case 8:
-                int easy9[][] = {
+                return new int[][]{
                         {0, 0, 8, 0, 0, 0, 6, 0, 0},
                         {0, 5, 0, 0, 4, 0, 0, 8, 0},
                         {7, 9, 0, 6, 0, 8, 0, 4, 5},
@@ -660,10 +625,8 @@ class SudokuGrid extends JFrame {
                         {0, 3, 0, 0, 6, 0, 0, 2, 0},
                         {0, 0, 4, 0, 0, 0, 7, 0, 0},
                 };
-                return easy9;
-
             case 9:
-                int easy10[][] = {
+                return new int[][]{
                         {0, 0, 0, 0, 0, 7, 0, 0, 4},
                         {8, 0, 0, 0, 0, 0, 0, 6, 0},
                         {5, 4, 0, 9, 2, 0, 0, 0, 1},
@@ -674,17 +637,15 @@ class SudokuGrid extends JFrame {
                         {0, 1, 0, 0, 0, 0, 0, 0, 5},
                         {6, 0, 0, 7, 0, 0, 0, 0, 0},
                 };
-                return easy10;
         }
         return null;
     }
 
-    public int[][] midGame() {
-        // TODO Auto-generated method stub
+    public int[][] MidGame() {
         int a = (int) (Math.random() * 10);
         switch (a) {
             case 0:
-                int mid1[][] = {
+                return new int[][]{
                         {0, 0, 0, 1, 0, 0, 2, 6, 0},
                         {7, 0, 0, 0, 3, 0, 0, 0, 0},
                         {3, 0, 2, 0, 8, 0, 4, 0, 0},
@@ -695,10 +656,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 0, 4, 0, 0, 0, 8},
                         {0, 5, 7, 0, 0, 9, 0, 0, 0},
                 };
-                return mid1;
-
             case 1:
-                int mid2[][] = {
+                return new int[][]{
                         {0, 0, 8, 0, 9, 0, 0, 0, 0},
                         {0, 7, 0, 0, 0, 0, 2, 8, 0},
                         {0, 6, 4, 1, 0, 0, 3, 0, 9},
@@ -709,10 +668,8 @@ class SudokuGrid extends JFrame {
                         {0, 9, 7, 0, 0, 0, 0, 1, 0},
                         {0, 0, 0, 0, 6, 0, 0, 7, 0},
                 };
-                return mid2;
-
             case 2:
-                int mid3[][] = {
+                return new int[][]{
                         {0, 0, 0, 7, 0, 2, 0, 0, 0},
                         {1, 0, 0, 0, 4, 0, 0, 0, 7},
                         {6, 5, 0, 0, 0, 0, 0, 9, 4},
@@ -723,10 +680,8 @@ class SudokuGrid extends JFrame {
                         {9, 0, 0, 0, 6, 0, 0, 0, 8},
                         {0, 0, 0, 9, 0, 8, 0, 0, 0},
                 };
-                return mid3;
-
             case 3:
-                int mid4[][] = {
+                return new int[][]{
                         {0, 0, 7, 2, 3, 8, 0, 0, 0},
                         {0, 6, 0, 7, 0, 0, 0, 5, 0},
                         {0, 0, 4, 0, 0, 0, 0, 0, 2},
@@ -737,10 +692,8 @@ class SudokuGrid extends JFrame {
                         {0, 2, 0, 0, 0, 5, 0, 3, 0},
                         {0, 0, 0, 1, 7, 4, 9, 0, 0},
                 };
-                return mid4;
-
             case 4:
-                int mid5[][] = {
+                return new int[][]{
                         {5, 0, 7, 0, 0, 0, 0, 0, 9},
                         {0, 8, 0, 0, 0, 2, 1, 7, 0},
                         {0, 1, 0, 0, 6, 0, 0, 0, 4},
@@ -751,10 +704,8 @@ class SudokuGrid extends JFrame {
                         {0, 7, 6, 2, 0, 0, 0, 9, 0},
                         {4, 0, 0, 0, 0, 0, 6, 0, 8},
                 };
-                return mid5;
-
             case 5:
-                int mid6[][] = {
+                return new int[][]{
                         {0, 0, 9, 7, 0, 0, 0, 0, 0},
                         {5, 0, 0, 0, 0, 2, 7, 0, 9},
                         {8, 0, 0, 0, 1, 0, 0, 0, 6},
@@ -765,10 +716,8 @@ class SudokuGrid extends JFrame {
                         {6, 0, 2, 3, 0, 0, 0, 0, 4},
                         {0, 0, 0, 0, 0, 7, 9, 0, 0},
                 };
-                return mid6;
-
             case 6:
-                int mid7[][] = {
+                return new int[][]{
                         {0, 0, 9, 0, 0, 0, 0, 6, 4},
                         {4, 0, 0, 0, 0, 0, 0, 0, 0},
                         {1, 0, 0, 3, 6, 0, 0, 7, 2},
@@ -779,10 +728,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 0, 0, 0, 0, 0, 5},
                         {3, 4, 0, 0, 0, 0, 6, 0, 0},
                 };
-                return mid7;
-
             case 7:
-                int mid8[][] = {
+                return new int[][]{
                         {0, 3, 0, 0, 0, 8, 0, 0, 5},
                         {0, 0, 5, 0, 0, 0, 8, 0, 7},
                         {0, 0, 0, 4, 0, 0, 9, 0, 0},
@@ -793,10 +740,8 @@ class SudokuGrid extends JFrame {
                         {5, 0, 1, 0, 0, 0, 7, 0, 0},
                         {6, 0, 0, 9, 0, 0, 0, 2, 0},
                 };
-                return mid8;
-
             case 8:
-                int mid9[][] = {
+                return new int[][]{
                         {3, 0, 2, 7, 0, 0, 0, 0, 9},
                         {0, 0, 8, 0, 0, 0, 0, 4, 5},
                         {0, 0, 4, 0, 0, 1, 3, 0, 0},
@@ -807,9 +752,8 @@ class SudokuGrid extends JFrame {
                         {2, 6, 0, 0, 0, 0, 1, 0, 0},
                         {4, 0, 0, 0, 0, 2, 5, 0, 3},
                 };
-                return mid9;
-                case 9:
-                    int mid10[][] = {
+            case 9:
+                return new int[][]{
                         {0, 9, 5, 0, 0, 8, 0, 0, 0},
                         {0, 0, 2, 0, 0, 6, 7, 0, 0},
                         {0, 4, 0, 0, 0, 0, 0, 0, 5},
@@ -819,18 +763,16 @@ class SudokuGrid extends JFrame {
                         {2, 0, 0, 0, 0, 0, 0, 4, 0},
                         {0, 0, 6, 1, 0, 0, 3, 0, 0},
                         {0, 0, 0, 3, 0, 0, 2, 5, 0},
-                    };
-                return mid10;
+                };
         }
         return null;
     }
 
-    public int[][] hardGame() {
-        // TODO Auto-generated method stub
+    public int[][] HardGame() {
         int a = (int) (Math.random() * 10);
         switch (a) {
             case 0:
-                int hard1[][] = {
+                return new int[][]{
                         {0, 1, 0, 0, 0, 8, 4, 0, 7},
                         {9, 5, 0, 0, 0, 0, 0, 0, 0},
                         {0, 0, 8, 0, 1, 0, 0, 0, 0},
@@ -841,10 +783,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 0, 0, 0, 0, 8, 2},
                         {5, 0, 3, 2, 0, 0, 0, 1, 0},
                 };
-                return hard1;
-
             case 1:
-                int hard2[][] = {
+                return new int[][]{
                         {7, 5, 0, 9, 0, 0, 0, 4, 6},
                         {9, 0, 1, 0, 0, 0, 3, 0, 2},
                         {0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -855,10 +795,8 @@ class SudokuGrid extends JFrame {
                         {3, 0, 9, 0, 0, 0, 2, 0, 4},
                         {8, 4, 0, 0, 3, 0, 0, 7, 9},
                 };
-                return hard2;
-
             case 2:
-                int hard3[][] = {
+                return new int[][]{
                         {0, 0, 0, 8, 9, 0, 0, 2, 0},
                         {0, 0, 9, 0, 0, 5, 0, 0, 7},
                         {0, 5, 0, 0, 0, 0, 3, 0, 0},
@@ -869,10 +807,8 @@ class SudokuGrid extends JFrame {
                         {9, 0, 0, 6, 0, 0, 4, 0, 0},
                         {0, 1, 0, 0, 2, 8, 0, 0, 0},
                 };
-                return hard3;
-
             case 3:
-                int hard4[][] = {
+                return new int[][]{
                         {0, 8, 0, 7, 9, 0, 0, 0, 0},
                         {0, 0, 0, 0, 0, 2, 0, 9, 0},
                         {0, 0, 3, 0, 0, 8, 4, 5, 0},
@@ -883,10 +819,8 @@ class SudokuGrid extends JFrame {
                         {0, 4, 0, 8, 0, 0, 0, 0, 0},
                         {0, 0, 0, 0, 6, 4, 0, 2, 0},
                 };
-                return hard4;
-
             case 4:
-                int hard5[][] = {
+                return new int[][]{
                         {0, 0, 0, 4, 0, 0, 0, 0, 2},
                         {0, 0, 4, 0, 1, 2, 0, 0, 9},
                         {0, 7, 0, 0, 0, 8, 0, 0, 0},
@@ -897,10 +831,8 @@ class SudokuGrid extends JFrame {
                         {6, 0, 0, 1, 2, 0, 3, 0, 0},
                         {1, 0, 0, 0, 0, 3, 0, 0, 0},
                 };
-                return hard5;
-
             case 5:
-                int hard6[][] = {
+                return new int[][]{
                         {1, 0, 0, 0, 3, 4, 0, 0, 9},
                         {7, 4, 0, 0, 0, 0, 0, 0, 0},
                         {0, 0, 0, 0, 8, 0, 2, 0, 0},
@@ -911,10 +843,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 0, 0, 0, 0, 9, 6},
                         {6, 0, 0, 9, 7, 0, 0, 0, 5},
                 };
-                return hard6;
-
             case 6:
-                int hard7[][] = {
+                return new int[][]{
                         {0, 6, 0, 0, 0, 0, 0, 2, 7},
                         {0, 0, 0, 5, 1, 0, 0, 0, 0},
                         {7, 0, 0, 8, 0, 0, 0, 0, 9},
@@ -925,10 +855,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 0, 0, 6, 3, 0, 0, 0},
                         {6, 9, 0, 0, 0, 0, 0, 3, 0},
                 };
-                return hard7;
-
             case 7:
-                int hard8[][] = {
+                return new int[][]{
                         {0, 0, 0, 3, 4, 0, 0, 0, 0},
                         {2, 0, 0, 0, 0, 0, 4, 0, 7},
                         {0, 7, 0, 0, 0, 8, 0, 0, 5},
@@ -939,10 +867,8 @@ class SudokuGrid extends JFrame {
                         {1, 0, 2, 0, 0, 0, 0, 0, 9},
                         {0, 0, 0, 0, 1, 4, 0, 0, 0},
                 };
-                return hard8;
-
             case 8:
-                int hard9[][] = {
+                return new int[][]{
                         {0, 8, 0, 0, 0, 0, 0, 2, 0},
                         {0, 0, 1, 0, 0, 0, 6, 0, 0},
                         {2, 0, 0, 0, 5, 0, 0, 0, 3},
@@ -953,10 +879,8 @@ class SudokuGrid extends JFrame {
                         {0, 0, 7, 0, 0, 0, 9, 0, 0},
                         {0, 4, 0, 0, 0, 0, 0, 3, 0},
                 };
-                return hard9;
-
             case 9:
-                int hard10[][] = {
+                return new int[][]{
                         {0, 1, 9, 2, 0, 0, 5, 0, 0},
                         {7, 0, 0, 0, 8, 0, 3, 0, 0},
                         {0, 4, 0, 5, 0, 0, 0, 0, 0},
@@ -967,11 +891,7 @@ class SudokuGrid extends JFrame {
                         {0, 0, 5, 0, 1, 0, 0, 0, 6},
                         {0, 0, 2, 0, 0, 6, 7, 9, 0},
                 };
-                return hard10;
         }
         return null;
     }
 }
-
-
-
