@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class Project {
     public static void main(String[] args) {
@@ -27,20 +29,23 @@ class SudokuGrid extends JFrame {
     JButton jbnArchive;
     JButton jbnRead;
     JButton jbnJudgement;
+    JButton jbnTime;
     JPanel[] pnlGame;
     JTextField[][][] txtGame;
     UndoManager undoManager;
+    public static ArrayList<String> result = new ArrayList<>();
 
     public SudokuGrid() {
         pnlGame = new JPanel[9];
         txtGame = new JTextField[9][3][3];
         gridInit();
+        new Timer();
     }
 
     public void gridInit() {
         Container container = this.getContentPane();
         container.setLayout(null);
-        this.setSize(1100, 715);
+        this.setSize(1100, 800);
         this.setLocationRelativeTo(null);
         this.setTitle("Sudoku Game");
         undoManager = new UndoManager();
@@ -50,6 +55,18 @@ class SudokuGrid extends JFrame {
         jllNewGame.setSize(375, 100);
         jllNewGame.setLocation(700, 0);
         container.add(jllNewGame);
+
+        jbnTime = new JButton("纪录");
+        jbnTime.setLocation(735, 650);
+        jbnTime.setSize(300, 75);
+        jbnTime.setFont(new Font("微软雅黑", Font.PLAIN, 40));
+        jbnTime.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                Record();
+            }
+        });
+        container.add(jbnTime);
 
         jbnEasy = new JButton("简单");
         jbnEasy.setBackground(Color.green);
@@ -235,7 +252,6 @@ class SudokuGrid extends JFrame {
         JLabel labelWin = new JLabel();
         JLabel labelLose = new JLabel();
 
-        ArrayList<String> result = new ArrayList<>();
         newSudoku:
         for (int i = 1; i <= 1; i++) {
             int[][] sudoku = new int[9][9];
@@ -469,19 +485,56 @@ class SudokuGrid extends JFrame {
             for (int column = 0; column < 9; column += 3) {
                 for (int squareLine = line; squareLine < line + 3; squareLine++) {
                     for (int squareCol = column; squareCol < column + 3; squareCol++) {
-                        if (sudokuLoad[squareLine][squareCol] != 0 ) {
+                        if (sudokuLoad[squareLine][squareCol] != 0) {
                             txtGame[z][squareLine % 3][squareCol % 3].setText(String.valueOf(sudokuLoad[squareLine][squareCol]));
                         }
-                        if (sudokuEditable[squareLine][squareCol] == 0){
+                        if (sudokuEditable[squareLine][squareCol] == 0) {
                             txtGame[z][squareLine % 3][squareCol % 3].setEditable(false);
                         }
-                        if (sudokuEditable[squareLine][squareCol] == 1){
+                        if (sudokuEditable[squareLine][squareCol] == 1) {
                             txtGame[z][squareLine % 3][squareCol % 3].setEditable(true);
                         }
                     }
                 }
                 z = z + 1;
             }
+        }
+    }
+
+    public boolean isRecord = true;
+    public void Record() {
+        File fileTime = new File("TimeRecord.txt");
+        Scanner input = null;
+        try {
+            input = new Scanner(fileTime);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String List = input.nextLine();
+        String[] timeList = List.split(" ");
+
+        int[] time = new int[timeList.length];
+        for (int i = 0; i < timeList.length; i++) {
+            time[i] = Integer.parseInt(timeList[i]);
+        }
+        Arrays.sort(time);
+
+        int hour, minute, second, milli;
+        int elapsed = time[0];
+        milli = elapsed % 1000;
+        elapsed = elapsed / 1000;
+        second = elapsed % 60;
+        elapsed = elapsed / 60;
+        minute = elapsed % 60;
+        elapsed = elapsed / 60;
+        hour = elapsed % 60;
+
+        if (isRecord) {
+            jbnTime.setText(hour + ":" + minute + ":" + second + " " + milli);
+            isRecord = false;
+        } else{
+            jbnTime.setText("记录");
+            isRecord = true;
         }
     }
 
@@ -893,5 +946,168 @@ class SudokuGrid extends JFrame {
                 };
         }
         return null;
+    }
+
+    class Timer extends JFrame {
+        public Timer() {
+            timer();
+        }
+
+        public void timer() {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Timer frame = new Timer("Timer");
+            frame.pack();
+            frame.setVisible(true);
+        }
+
+        private static final long serialVersionUID = 1L;
+        private static final String INITIAL_LABEL_TEXT = "00:00:00 000";
+        // 计数线程
+        private CountingThread thread = new CountingThread();
+        // 记录程序开始时间
+        private long programStart = System.currentTimeMillis();
+        // 程序一开始就是暂停的
+        private long pauseStart = programStart;
+        // 程序暂停的总时间
+        private long pauseCount = 0;
+        private JLabel label = new JLabel(INITIAL_LABEL_TEXT);
+        private JButton pauseButton = new JButton("暂停");
+        private JButton resetButton = new JButton("清零");
+
+        private ActionListener startPauseButtonListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (thread.stopped) {
+                    pauseCount += (System.currentTimeMillis() - pauseStart);
+                    thread.stopped = false;
+                } else {
+                    pauseStart = System.currentTimeMillis();
+                    thread.stopped = true;
+
+                    for (String str : SudokuGrid.result) {
+                        if (str.equals("Right")) {
+                            long elapsed = System.currentTimeMillis() - programStart - pauseCount;
+                            String time = String.format(String.valueOf(elapsed)) + " ";
+                            WriteToText(time);
+                        }
+                    }
+                }
+            }
+        };
+
+        private ActionListener resetButtonListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                pauseStart = programStart;
+                pauseCount = 0;
+                thread.stopped = true;
+                label.setText(INITIAL_LABEL_TEXT);
+            }
+        };
+
+        public Timer(String title) throws HeadlessException {
+            super(title);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            setLocation(300, 0);
+            setResizable(false);
+
+            setupBorder();
+            setupLabel();
+            setupButtonsPanel();
+
+            pauseButton.addActionListener(startPauseButtonListener);
+            resetButton.addActionListener(resetButtonListener);
+            jbnEasy.addActionListener(startPauseButtonListener);
+            jbnMid.addActionListener(startPauseButtonListener);
+            jbnHard.addActionListener(startPauseButtonListener);
+            jbnEasy.addActionListener(resetButtonListener);
+            jbnMid.addActionListener(resetButtonListener);
+            jbnHard.addActionListener(resetButtonListener);
+
+            // 计数线程一直就运行着
+            thread.start();
+        }
+
+        // 为窗体面板添加边框
+        private void setupBorder() {
+            JPanel contentPane = new JPanel(new BorderLayout());
+            contentPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            this.setContentPane(contentPane);
+        }
+
+        // 配置标签
+        private void setupLabel() {
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setFont(new Font(label.getFont().getName(), label.getFont().getStyle(), 40));
+            this.add(label, BorderLayout.CENTER);
+        }
+
+        // 配置按钮
+        private void setupButtonsPanel() {
+            JPanel panel = new JPanel(new FlowLayout());
+            panel.add(pauseButton);
+            panel.add(resetButton);
+            add(panel, BorderLayout.SOUTH);
+        }
+
+        private class CountingThread extends Thread {
+            public boolean stopped = true;
+
+            private CountingThread() {
+                setDaemon(true);
+            }
+
+            @Override
+            public void run() {
+                while (true) {
+                    if (!stopped) {
+                        long elapsed = System.currentTimeMillis() - programStart - pauseCount;
+                        label.setText(format(elapsed));
+                    }
+
+                    try {
+                        sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        System.exit(1);
+                    }
+                }
+            }
+
+            // 将毫秒数格式化
+            public String format(long elapsed) {
+                int hour, minute, second, milli;
+                milli = (int) (elapsed % 1000);
+                elapsed = elapsed / 1000;
+                second = (int) (elapsed % 60);
+                elapsed = elapsed / 60;
+                minute = (int) (elapsed % 60);
+                elapsed = elapsed / 60;
+                hour = (int) (elapsed % 60);
+                return String.format("%02d:%02d:%02d %03d", hour, minute, second, milli);
+            }
+        }
+
+        public void WriteToText(String str) {
+            FileOutputStream output = null;
+            String filename = "TimeRecord.txt";
+            byte[] buff = new byte[]{};
+            try {
+                File file = new File(filename);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                buff = str.getBytes();
+                output = new FileOutputStream(file, true);
+                output.write(buff);
+                output.flush();
+                output.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
